@@ -14,7 +14,7 @@ namespace Quadspace.Game {
 
         public void BeginMatch() {
             foreach (var fieldBehaviour in fields) {
-                fieldBehaviour.Initialize();
+                fieldBehaviour.Initialize().Forget();
             }
         }
     }

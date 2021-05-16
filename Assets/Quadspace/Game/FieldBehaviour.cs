@@ -25,13 +25,20 @@ namespace Quadspace.Game {
         private List<string> bag;
         private Random rand = new Random();
 
+        public event Action ResetField;
         public event Action Initialized;
         public event Action<int> NewPiece;
         public event Action<Piece> PieceSpawned;
 
-        public void Initialize() {
+        public async UniTask Initialize() {
             CancelTokenSource?.Cancel();
+            
+            ResetField?.Invoke();
+
+            await UniTask.DelayFrame(10);
+            
             CancelTokenSource = new CancellationTokenSource();
+            
             field = new Field(match.MatchEnv);
             currentPiece.Hide();
             holdPiece.Hide();
@@ -74,7 +81,7 @@ namespace Quadspace.Game {
                 }
             }
 
-            await UniTask.DelayFrame(6, PlayerLoopTiming.FixedUpdate, CancelTokenSource.Token);
+            await UniTask.DelayFrame(3, PlayerLoopTiming.FixedUpdate, CancelTokenSource.Token);
 
             SpawnPiece();
         }

@@ -30,8 +30,11 @@ namespace Quadspace.Quadspace.TBP {
                 botExePathText.text = System.IO.Path.GetFileName(botExePath);
             }
 
-            fb.Initialized += () => {
+            fb.ResetField += () => {
                 manager?.Dispose();
+            };
+
+            fb.Initialized += () => {
                 if (!string.IsNullOrEmpty(botExePath)) {
                     manager = new BotManager(botExePath, this);
                     manager.Launch(fb);
@@ -59,6 +62,7 @@ namespace Quadspace.Quadspace.TBP {
         public async UniTask MoveAsync(IEnumerable<Instruction> input, bool hold, CancellationToken cancel) {
             var sb = new StringBuilder();
             if (hold) sb.Append("Hold ");
+            instructions.Clear();
             foreach (var i in input) {
                 instructions.Enqueue(i);
                 sb.Append(i.ToString()).Append(' ');
@@ -74,6 +78,7 @@ namespace Quadspace.Quadspace.TBP {
 
             while (instructions.Count != 0) {
                 var inst = instructions.Dequeue();
+                if (cancel.IsCancellationRequested) return;
                 if (inst == prevInstruction) await UniTask.Yield(PlayerLoopTiming.FixedUpdate, cancel);
                 switch (inst) {
                     case Instruction.Left:
