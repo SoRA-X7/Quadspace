@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Z
   m_EditorClassIdentifier: 
   name: Z
-  BlockDescriptor: {fileID: 11400000, guid: 9ac447d94849941c3aa7ba166dda2a55, type: 2}
+  blockDescriptor: {fileID: 11400000, guid: 9ac447d94849941c3aa7ba166dda2a55, type: 2}
   blocks:
   - {x: 0, y: 0}
   - {x: 1, y: 0}

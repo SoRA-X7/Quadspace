@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Quadspace.Game;
 using Quadspace.Game.Moves;
@@ -20,6 +21,8 @@ namespace Quadspace.Quadspace.TBP {
         private StreamReader stderr;
         private StreamWriter stdin;
         private UniTask runner;
+        private CancellationTokenSource cancelSource = new CancellationTokenSource();
+        private SemaphoreSlim semaphore;
         private BotController controller;
         private FieldBehaviour fb;
         private Field field;
@@ -32,6 +35,7 @@ namespace Quadspace.Quadspace.TBP {
         public BotManager(string pathToExecutable, BotController controller) {
             this.pathToExecutable = pathToExecutable;
             this.controller = controller;
+            semaphore = new SemaphoreSlim(1, 1);
         }
 
         public void Launch(FieldBehaviour fb) {
@@ -56,7 +60,7 @@ namespace Quadspace.Quadspace.TBP {
 
         private async void OnNewPiece(int p) {
             if (status < BotStatus.Running) {
-                await UniTask.WaitUntil(() => status == BotStatus.Running);
+                await UniTask.WaitUntil(() => status == BotStatus.Running, cancellationToken: fb.CancelTokenSource.Token);
             } else if (status > BotStatus.Running) {
                 return;
             }
@@ -66,7 +70,7 @@ namespace Quadspace.Quadspace.TBP {
 
         private async void OnPieceSpawned(Piece p) {
             if (status < BotStatus.Running) {
-                await UniTask.WaitUntil(() => status == BotStatus.Running);
+                await UniTask.WaitUntil(() => status == BotStatus.Running, cancellationToken: fb.CancelTokenSource.Token);
             } else if (status > BotStatus.Running) {
                 return;
             }
@@ -150,7 +154,7 @@ namespace Quadspace.Quadspace.TBP {
                                 moves = null;
                                 success = true;
                                 UniTask.Run(() => controller.MoveAsync(pickedPath!.Value.instructions,
-                                    candidate.kind != fb.currentPiece.content.kind)).Forget();
+                                    candidate.kind != fb.currentPiece.content.kind, fb.CancelTokenSource.Token)).Forget();
                                 break;
                             }
                         }
@@ -183,14 +187,19 @@ namespace Quadspace.Quadspace.TBP {
         private async UniTask Send<T>(T msg) where T : TbpFrontendMessage {
             var json = JsonSerializer.ToJsonString(msg);
             Debug.Log(json);
-            await stdin.WriteLineAsync(json);
+            try {
+                await semaphore.WaitAsync().AsUniTask(false);
+                await stdin.WriteLineAsync(json);
+            } finally {
+                semaphore.Release();
+            }
         }
 
         public void Dispose() {
-            if (status > BotStatus.NotInitialized) {
-                fb.NewPiece -= OnNewPiece;
-                fb.PieceSpawned -= OnPieceSpawned;
-            }
+            cancelSource.Cancel();
+            if (status == BotStatus.NotInitialized) return;
+            fb.NewPiece -= OnNewPiece;
+            fb.PieceSpawned -= OnPieceSpawned;
 
             if (process?.HasExited ?? true) return;
             stdin.WriteLine(JsonSerializer.ToJsonString(new TbpFrontendMessage(FrontendMessageType.quit)));

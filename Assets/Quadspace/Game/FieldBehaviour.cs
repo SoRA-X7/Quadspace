@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Quadspace.Game.Interaction;
 using Quadspace.Game.Moves;
@@ -17,6 +18,8 @@ namespace Quadspace.Game {
         [SerializeField] private Match match;
         [SerializeField] private FieldBlockManager blockManager;
 
+        public CancellationTokenSource CancelTokenSource { get; private set; }
+
         private bool pieceAvailable;
         private string[] templateBag;
         private List<string> bag;
@@ -27,8 +30,11 @@ namespace Quadspace.Game {
         public event Action<Piece> PieceSpawned;
 
         public void Initialize() {
+            CancelTokenSource?.Cancel();
+            CancelTokenSource = new CancellationTokenSource();
             field = new Field(match.MatchEnv);
             currentPiece.Hide();
+            holdPiece.Hide();
             templateBag = new[] {"I", "O", "T", "J", "L", "S", "Z"}; //TODO
             bag = new List<string>(templateBag);
             foreach (var t in nextPieces) {
@@ -36,6 +42,8 @@ namespace Quadspace.Game {
                 field.Next.Enqueue(p);
                 t.SetOverwriteType(new Piece {kind = p});
             }
+
+            blockManager.Clear();
 
             Initialized?.Invoke();
 
@@ -66,7 +74,7 @@ namespace Quadspace.Game {
                 }
             }
 
-            await UniTask.DelayFrame(6, PlayerLoopTiming.FixedUpdate);
+            await UniTask.DelayFrame(6, PlayerLoopTiming.FixedUpdate, CancelTokenSource.Token);
 
             SpawnPiece();
         }

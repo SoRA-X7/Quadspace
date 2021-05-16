@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Quadspace.Game.ScriptableObjects;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 namespace Quadspace.Game {
     public class FieldBlockManager : MonoBehaviour {
@@ -44,6 +43,14 @@ namespace Quadspace.Game {
             instances.Remove(pos);
             obj.transform.localPosition += (Vector3) (Vector2) offset;
             instances.Add(pos + offset, obj);
+        }
+
+        public void Clear() {
+            foreach (var instance in instances.Values) {
+                Return(instance);
+            }
+            
+            instances.Clear();
         }
     }
 }
