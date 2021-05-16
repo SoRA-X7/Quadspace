@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Default Local Group
+  m_EditorClassIdentifier: 
+  m_GroupName: Default Local Group
+  m_Data:
+    m_SerializedData: []
+  m_GUID: c7a3f33c619774d4a8e44355efcdb8f6
+  m_SerializeEntries:
+  - m_GUID: fddcd02de767b4c3bafcb862973c56c7
+    m_Address: Assets/Definitions/Rotation
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - rotation_systems
+  - m_GUID: d4085bde7c07a4cf8bc0b5e89831d920
+    m_Address: Assets/Definitions/Piece
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - pieces
+  - m_GUID: 88b46947ab509450389f097865d27346
+    m_Address: Assets/Definitions/Block
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - blocks
+  - m_GUID: 6dd367e3ae7e94fe8be5d711dd0ce3df
+    m_Address: Assets/Prefabs/Block.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 4a55c485f92c64f99952dde91917e21e, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 9d5b31ddff8cd4b5bbfc442d6bf299a4, type: 2}
+    - {fileID: 11400000, guid: f5e34ba2553f44c8babad4b5c9f1de88, type: 2}
