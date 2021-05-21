@@ -36,6 +36,15 @@ MonoBehaviour:
     m_Address: Assets/Prefabs/Block.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 55cbf5528d24248398ce4ff474d63a21
+    m_Address: Assets/Materials/Block.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 2375d0418ff1840d985b585e4166aadb
+    m_Address: Assets/Definitions/Spin
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - spin_detectors
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 4a55c485f92c64f99952dde91917e21e, type: 2}
   m_SchemaSet:

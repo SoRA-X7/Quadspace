@@ -6,7 +6,7 @@ namespace Quadspace.Game {
         [SerializeField] private new Renderer renderer;
 
         public void SetType(BlockDescriptor type) {
-            var mat = type.material;
+            var mat = type.Mat;
             renderer.enabled = mat;
             if (mat) {
                 renderer.material = mat;

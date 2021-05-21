@@ -5,7 +5,19 @@ namespace Quadspace.Game.ScriptableObjects {
     [CreateAssetMenu]
     public class BlockDescriptor : IndexedScriptableObject {
         public string blockID;
-        public Color color;
-        public Material material;
+        [ColorUsage(true, true)] public Color color;
+        [ColorUsage(true, true)] public Color emission;
+        [SerializeField] private Material material;
+
+        public Material Mat {
+            get {
+                if (!material) {
+                    material = new Material(MatchEnvironment.blockMaterial);
+                    material.SetColor(Shader.PropertyToID("_BaseColor"), color);
+                    material.SetColor(Shader.PropertyToID("_EmissionColor"), emission);
+                }
+                return material;
+            }
+        }
     }
 }

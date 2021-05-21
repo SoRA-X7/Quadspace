@@ -78,8 +78,8 @@ namespace Quadspace.Quadspace.TBP {
 
             while (instructions.Count != 0) {
                 var inst = instructions.Dequeue();
-                if (cancel.IsCancellationRequested) return;
                 if (inst == prevInstruction) await UniTask.Yield(PlayerLoopTiming.FixedUpdate, cancel);
+                if (cancel.IsCancellationRequested) return;
                 switch (inst) {
                     case Instruction.Left:
                         Strafe(-1);

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Quadspace.Game.ScriptableObjects;
 using UnityEngine;
 
 namespace Quadspace.Game {
@@ -24,7 +25,12 @@ namespace Quadspace.Game {
         }
 
         public readonly RotationSystemModuleDescriptor GetRotationSystem(MatchEnvironment env) {
-            env.rotationSystemLookup.TryGetValue(MatchEnvironment.pieceRegistry[kind], out var sys);
+            env.rotationSystemLookup.TryGetValue(kind, out var sys);
+            return sys;
+        }
+
+        public readonly SpinDetectorDescriptor GetSpinDetector(MatchEnvironment env) {
+            env.spinDetectorLookup.TryGetValue(kind, out var sys);
             return sys;
         }
 

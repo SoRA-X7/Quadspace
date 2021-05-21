@@ -31,6 +31,7 @@ namespace Quadspace.Quadspace.TBP {
         private Path? pickedPath;
         private bool forfeit;
         public TbpInfoMessage BotInfo { get; private set; }
+        public int PickedMoveIndex { get; private set; }
 
         public BotManager(string pathToExecutable, BotController controller) {
             this.pathToExecutable = pathToExecutable;
@@ -145,6 +146,7 @@ namespace Quadspace.Quadspace.TBP {
 
                         var suggestion = JsonSerializer.Deserialize<TbpSuggestionMessage>(line);
                         var success = false;
+                        PickedMoveIndex = 0;
                         foreach (var candidate in suggestion.moves.Select(c => (Piece) c)) {
                             if (moves.locked.ContainsKey(candidate)) {
                                 await UniTask.WhenAll(
@@ -157,6 +159,8 @@ namespace Quadspace.Quadspace.TBP {
                                     candidate.kind != fb.currentPiece.content.kind, fb.CancelTokenSource.Token)).Forget();
                                 break;
                             }
+
+                            PickedMoveIndex++;
                         }
 
                         if (!success) {

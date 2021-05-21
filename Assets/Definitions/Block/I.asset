@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blockID: I
   color: {r: 0, g: 0.8310704, b: 1, a: 1}
-  material: {fileID: 2100000, guid: 1e3ade1e00b7345b0b7265250022b089, type: 2}
+  emission: {r: 0.023529412, g: 1.8745098, b: 2, a: 1}

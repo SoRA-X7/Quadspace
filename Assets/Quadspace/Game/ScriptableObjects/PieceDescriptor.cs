@@ -7,6 +7,7 @@ namespace Quadspace.Game.ScriptableObjects {
     [CreateAssetMenu]
     public class PieceDescriptor : IndexedScriptableObject {
         public new string name;
+        public string block;
         public BlockDescriptor blockDescriptor;
         [SerializeField] private List<Vector2Int> blocks;
 

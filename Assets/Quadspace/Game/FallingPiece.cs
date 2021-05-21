@@ -8,7 +8,6 @@ namespace Quadspace.Game {
         public Piece content;
 
         private List<BlockBehaviour> blocks = new List<BlockBehaviour>();
-        private PieceDescriptor descriptor;
 
         [SerializeField] private BlockBehaviour blockPrefab;
 
@@ -17,14 +16,14 @@ namespace Quadspace.Game {
 
         public void SetOverwriteType(Piece piece) {
             content = piece;
-            descriptor = MatchEnvironment.pieceRegistry[piece.kind];
+            var descriptor = MatchEnvironment.GetBlockFromPiece(piece.kind);
             var positions = piece.GetPositions().ToList(); //TODO reduce allocation
             while (blocks.Count < positions.Count) {
                 blocks.Add(Instantiate(blockPrefab, transform));
             }
             
             foreach (var block in blocks) {
-                block.SetType(descriptor.blockDescriptor);
+                block.SetType(descriptor);
             }
 
             for (var i = 0; i < blocks.Count; i++) {

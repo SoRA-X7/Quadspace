@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: L
   m_EditorClassIdentifier: 
   name: L
+  block: L
   blockDescriptor: {fileID: 11400000, guid: 49c429d55643b49419f8996e539b3907, type: 2}
   blocks:
   - {x: -1, y: 0}

@@ -49,15 +49,22 @@ namespace Quadspace.Game {
 
         public Piece? Rotate(Piece piece, bool cw) {
             var rs = piece.GetRotationSystem(environment);
+            var sd = piece.GetSpinDetector(environment);
 
             if (!rs) return null;
 
             var to = (piece.r + (cw ? 1 : 3)) % 4;
-            foreach (var offset in rs[piece.r].Zip(rs[to], (v1, v2) => v1 - v2)) {
-                var rot = new Piece(piece.kind, piece.x + offset.y, piece.y + offset.y, to, /* TODO */ SpinStatus.None);
+            var i = 0;
+            foreach (var offset in rs.Get(piece.r, cw)) {
+                var rot = new Piece(piece.kind, piece.x + offset.x, piece.y + offset.y, to, SpinStatus.None);
+                if (sd) {
+                    rot = new Piece(piece.kind, piece.x + offset.x, piece.y + offset.y, to, sd.CheckSpin(this, rot, i));
+                }
                 if (!Collides(rot)) {
                     return rot;
                 }
+
+                i++;
             }
 
             return null;
@@ -85,6 +92,11 @@ namespace Quadspace.Game {
             return new LockResult {
                 clearedLines = clearedLines
             };
+        }
+
+        public bool Occupied(Vector2Int pos) {
+            if (pos.x < 0 || pos.y < 0 || pos.x >= fieldSize.x || pos.y >= fieldSize.y) return true;
+            return Rows[pos.y][pos.x];
         }
     }
 }
