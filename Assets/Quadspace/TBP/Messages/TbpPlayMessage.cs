@@ -1,4 +1,4 @@
-namespace Quadspace.Quadspace.TBP.Messages {
+namespace Quadspace.TBP.Messages {
     public class TbpPlayMessage : TbpFrontendMessage {
         public TbpMove move;
 

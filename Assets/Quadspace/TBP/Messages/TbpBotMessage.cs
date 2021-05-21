@@ -1,4 +1,4 @@
-namespace Quadspace.Quadspace.TBP.Messages {
+namespace Quadspace.TBP.Messages {
     public class TbpBotMessage {
         public BotMessageType type;
     }

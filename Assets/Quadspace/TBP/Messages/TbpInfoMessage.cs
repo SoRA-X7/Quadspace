@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Quadspace.Quadspace.TBP.Messages {
+namespace Quadspace.TBP.Messages {
     public class TbpInfoMessage : TbpBotMessage {
         public string name;
         public string version;

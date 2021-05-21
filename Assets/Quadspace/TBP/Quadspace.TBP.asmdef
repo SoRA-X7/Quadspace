@@ -1,0 +1,20 @@
+{
+    "name": "Quadspace.TBP",
+    "rootNamespace": "",
+    "references": [
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:7335364490de449fc8cbc2990428b98a",
+        "GUID:46630c3a08d3247baa40a11cbcc8de1e",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:1149317e5507f49859fd80c85d04e5a1"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

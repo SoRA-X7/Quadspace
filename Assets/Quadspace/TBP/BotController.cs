@@ -9,7 +9,7 @@ using SFB;
 using TMPro;
 using UnityEngine;
 
-namespace Quadspace.Quadspace.TBP {
+namespace Quadspace.TBP {
     public class BotController : MonoBehaviour {
         private const string PrefKeyBotExe = "bot_exe";
         private readonly Queue<Instruction> instructions = new Queue<Instruction>();

@@ -1,10 +1,10 @@
-using System;
 using TMPro;
 using UnityEngine;
 
-namespace Quadspace.Quadspace.TBP {
+namespace Quadspace.TBP {
     public class ShowMoveInfo : MonoBehaviour {
         [SerializeField] private TMP_Text moveIndex;
+        [SerializeField] private TMP_Text suggestionRespondTime;
         
         private BotController botController;
 
@@ -13,7 +13,8 @@ namespace Quadspace.Quadspace.TBP {
         }
 
         private void Update() {
-            moveIndex.text = botController.manager?.PickedMoveIndex.ToString() ?? "";
+            moveIndex.text = botController.manager?.PickedMoveIndex.ToString() ?? "N/A";
+            suggestionRespondTime.text = (botController.manager?.ResponseTimeInMillisecond.ToString() ?? "N/A ") + "ms";
         }
     }
 }

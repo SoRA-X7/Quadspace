@@ -1,4 +1,4 @@
-namespace Quadspace.Quadspace.TBP {
+namespace Quadspace.TBP {
     public enum BotStatus {
         NotInitialized,
         Initializing,

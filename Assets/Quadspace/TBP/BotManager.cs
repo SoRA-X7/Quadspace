@@ -6,13 +6,12 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Quadspace.Game;
 using Quadspace.Game.Moves;
-using Quadspace.Game.ScriptableObjects;
-using Quadspace.Quadspace.TBP.Messages;
+using Quadspace.TBP.Messages;
 using Utf8Json;
 using Debug = UnityEngine.Debug;
 using Path = Quadspace.Game.Moves.Path;
 
-namespace Quadspace.Quadspace.TBP {
+namespace Quadspace.TBP {
     public class BotManager : IDisposable {
         private string pathToExecutable;
         private Process process;
@@ -30,8 +29,10 @@ namespace Quadspace.Quadspace.TBP {
         private MoveGenerator moves;
         private Path? pickedPath;
         private bool forfeit;
+        private readonly Stopwatch suggestionTimer = new Stopwatch();
         public TbpInfoMessage BotInfo { get; private set; }
         public int PickedMoveIndex { get; private set; }
+        public long ResponseTimeInMillisecond { get; private set; }
 
         public BotManager(string pathToExecutable, BotController controller) {
             this.pathToExecutable = pathToExecutable;
@@ -77,6 +78,7 @@ namespace Quadspace.Quadspace.TBP {
             }
 
             await Send(new TbpFrontendMessage(FrontendMessageType.suggest));
+            suggestionTimer.Restart();
             var unhold = field.Hold ?? field.Next.First();
             moves = await MoveGenerator.Run(field, p,
                 p.kind != unhold ? new Piece(unhold, 4, 19, 0, SpinStatus.None) : (Piece?) null);
@@ -142,6 +144,7 @@ namespace Quadspace.Quadspace.TBP {
 
                     var msg = JsonSerializer.Deserialize<TbpBotMessage>(line);
                     if (msg.type == BotMessageType.suggestion) {
+                        ResponseTimeInMillisecond = suggestionTimer.ElapsedMilliseconds;
                         await UniTask.WaitWhile(() => moves == null);
 
                         var suggestion = JsonSerializer.Deserialize<TbpSuggestionMessage>(line);

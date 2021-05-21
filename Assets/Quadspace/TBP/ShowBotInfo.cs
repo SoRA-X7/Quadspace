@@ -1,9 +1,8 @@
-using System;
-using Quadspace.Quadspace.TBP.Messages;
+using Quadspace.TBP.Messages;
 using TMPro;
 using UnityEngine;
 
-namespace Quadspace.Quadspace.TBP {
+namespace Quadspace.TBP {
     public class ShowBotInfo : MonoBehaviour {
         [SerializeField] private TMP_Text name;
         [SerializeField] private TMP_Text author;

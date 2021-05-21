@@ -1,7 +1,6 @@
 using System;
-using Quadspace.Game;
 
-namespace Quadspace.Quadspace.TBP {
+namespace Quadspace.TBP {
     [Serializable]
     public struct TbpPieceLocation {
         public string type;
