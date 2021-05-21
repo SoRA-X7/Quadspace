@@ -47,7 +47,9 @@ namespace Quadspace.TBP {
             fb.PieceSpawned += OnPieceSpawned;
             var start = new ProcessStartInfo {
                 FileName = pathToExecutable,
+                WorkingDirectory = System.IO.Path.GetDirectoryName(pathToExecutable),
                 UseShellExecute = false,
+                CreateNoWindow = true,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true
