@@ -22,7 +22,7 @@ namespace Quadspace.TBP {
         private UniTask runner;
         private CancellationTokenSource cancelSource = new CancellationTokenSource();
         private SemaphoreSlim semaphore;
-        private BotController controller;
+        private GameInputProcessor controller;
         private FieldBehaviour fb;
         private Field field;
 
@@ -34,7 +34,7 @@ namespace Quadspace.TBP {
         public int PickedMoveIndex { get; private set; }
         public long ResponseTimeInMillisecond { get; private set; }
 
-        public BotManager(string pathToExecutable, BotController controller) {
+        public BotManager(string pathToExecutable, GameInputProcessor controller) {
             this.pathToExecutable = pathToExecutable;
             this.controller = controller;
             semaphore = new SemaphoreSlim(1, 1);

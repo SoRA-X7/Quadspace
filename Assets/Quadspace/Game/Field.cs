@@ -89,8 +89,18 @@ namespace Quadspace.Game {
                 }
             }
 
+            var pc = true;
+            foreach (var row in Rows) {
+                if (!row.Empty) {
+                    pc = false;
+                    break;
+                }
+            }
+
             return new LockResult {
-                clearedLines = clearedLines
+                clearedLines = clearedLines,
+                kind = PlacementKindFactory.Create(clearedLines.Count, piece.spin),
+                pc = pc
             };
         }
 

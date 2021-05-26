@@ -18,7 +18,7 @@ namespace Quadspace.Game {
         public static readonly Dictionary<string, BlockDescriptor> blockNameLookup =
             new Dictionary<string, BlockDescriptor>();
 
-        
+        public static GameConfig config = GameConfig.Load();
 
         public static Material blockMaterial;
 

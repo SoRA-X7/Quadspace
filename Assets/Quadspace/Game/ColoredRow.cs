@@ -36,5 +36,6 @@ namespace Quadspace.Game {
         }
 
         public bool Filled => blocks.All(b => b);
+        public bool Empty => !blocks.Any(b => b);
     }
 }

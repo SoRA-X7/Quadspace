@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Quadspace.Game.Interaction;
-using Quadspace.Game.Moves;
 using UnityEngine;
 using Random = System.Random;
 
@@ -32,13 +32,13 @@ namespace Quadspace.Game {
 
         public async UniTask Initialize() {
             CancelTokenSource?.Cancel();
-            
+
             ResetField?.Invoke();
 
             await UniTask.DelayFrame(10);
-            
+
             CancelTokenSource = new CancellationTokenSource();
-            
+
             field = new Field(match.MatchEnv);
             currentPiece.Hide();
             holdPiece.Hide();
@@ -61,6 +61,7 @@ namespace Quadspace.Game {
         }
 
         public async UniTask LockPiece() {
+            var delays = MatchEnvironment.config.Delays;
             currentPiece.Hide();
             currentPiece.content = field.SonicDrop(currentPiece.content);
             var res = field.LockPiece(currentPiece.content);
@@ -68,10 +69,17 @@ namespace Quadspace.Game {
                 blockManager.AddBlock(pos, MatchEnvironment.pieceRegistry[currentPiece.content.kind].blockDescriptor);
             }
 
+            if (res.clearedLines.Any()) {
+                field.Ren += 1;
+                field.BackToBack = res.kind.IsContinuous();
+            } else {
+                field.Ren = 0;
+            }
+
             for (var i = 0; i < res.clearedLines.Count; i++) {
                 var y = res.clearedLines[i] - i;
                 for (var x = 0; x < 10; x++) {
-                    blockManager.RemoveBlock(new Vector2Int(x,y));
+                    blockManager.RemoveBlock(new Vector2Int(x, y));
                 }
 
                 for (var y2 = y + 1; y2 < field.Rows.Count; y2++) {
@@ -81,7 +89,23 @@ namespace Quadspace.Game {
                 }
             }
 
-            await UniTask.DelayFrame(3, PlayerLoopTiming.FixedUpdate, CancelTokenSource.Token);
+            var delay = delays["placement"];
+            if (delays["usePcOverride"] == 1 && res.pc) {
+                delay += delays["pc"];
+            } else {
+                delay += res.clearedLines.Count switch {
+                    0 => 0,
+                    1 => delays["clear1"],
+                    2 => delays["clear2"],
+                    3 => delays["clear3"],
+                    4 => delays["clear4"],
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+            }
+
+            if (delay > 0) {
+                await UniTask.DelayFrame(delay, PlayerLoopTiming.FixedUpdate, CancelTokenSource.Token);
+            }
 
             SpawnPiece();
         }
