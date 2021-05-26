@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   buildAndTestForSomePlatforms:
     name: Build for ${{ matrix.targetPlatform }}
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       fail-fast: false
       matrix:
