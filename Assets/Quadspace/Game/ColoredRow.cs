@@ -30,6 +30,7 @@ namespace Quadspace.Game {
             if (blocks == null) {
                 throw new NullReferenceException("This row is not properly initialized");
             }
+
             if (x < 0 || x >= blocks.Length) {
                 throw new ArgumentOutOfRangeException(nameof(x));
             }
@@ -37,5 +38,14 @@ namespace Quadspace.Game {
 
         public bool Filled => blocks.All(b => b);
         public bool Empty => !blocks.Any(b => b);
+
+        public ColoredRow Clone() {
+            var cl = new ColoredRow(blocks.Length);
+            for (var i = 0; i < blocks.Length; i++) {
+                cl.blocks[i] = blocks[i];
+            }
+
+            return cl;
+        }
     }
 }

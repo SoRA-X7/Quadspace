@@ -11,16 +11,35 @@ namespace Quadspace.Game.ScriptableObjects {
         public BlockDescriptor blockDescriptor;
         [SerializeField] private List<Vector2Int> blocks;
 
-        private List<List<Vector2Int>> occupations;
+        public List<List<Vector2Int>> Occupations { get; private set; }
+        public List<List<Vector2Int?>> Canonicals { get; private set; }
 
-        public List<Vector2Int> GetBlocks(int spin) {
-            occupations ??= new List<List<Vector2Int>> {
+        private void OnEnable() {
+            Occupations = new List<List<Vector2Int>> {
                 blocks.ToList(),
                 blocks.Select(v => new Vector2Int(v.y, -v.x)).ToList(),
                 blocks.Select(v => new Vector2Int(-v.x, -v.y)).ToList(),
                 blocks.Select(v => new Vector2Int(-v.y, v.x)).ToList()
             };
-            return occupations[spin];
+
+            Canonicals = new List<List<Vector2Int?>>(4);
+            for (var s = 0; s < 4; s++) {
+                Canonicals.Add(new List<Vector2Int?>());
+                Canonicals[s].AddRange(Enumerable.Repeat((Vector2Int?)null, 4));
+                for (var x = -5; x < 5; x++) {
+                    for (var y = -5; y < 5; y++) {
+                        var offset = new Vector2Int(x, y);
+                        for (var s2 = 0; s2 < 4; s2++) {
+                            if (s2 == s) continue;
+
+                            if (Occupations[s].All(b => Occupations[s2].Contains(b - offset))) {
+                                Canonicals[s][s2] = offset;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

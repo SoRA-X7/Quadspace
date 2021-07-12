@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Quadspace.TBP.Randomizer;
 
 namespace Quadspace.TBP.Messages {
     public class TbpStartMessage : TbpFrontendMessage {
@@ -7,6 +8,7 @@ namespace Quadspace.TBP.Messages {
         public int combo;
         public bool back_to_back;
         public List<string[]> board;
+        public SevenBagRandomizerStart randomizer; //TODO
         public TbpStartMessage() : base(FrontendMessageType.start) { }
     }
 }

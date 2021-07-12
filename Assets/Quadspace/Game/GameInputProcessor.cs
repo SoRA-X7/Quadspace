@@ -18,14 +18,19 @@ namespace Quadspace.Game {
         }
 
         public async UniTask MoveAsync(IEnumerable<Instruction> input, bool hold, CancellationToken cancel) {
-            var sb = new StringBuilder();
-            if (hold) sb.Append("Hold ");
             instructions.Clear();
             foreach (var i in input) {
                 instructions.Enqueue(i);
-                sb.Append(i.ToString()).Append(' ');
             }
-            Debug.Log(sb.ToString());
+
+            if (MatchEnvironment.config.Logging["logMove"] == 1) {
+                var sb = new StringBuilder();
+                if (hold) sb.Append("Hold ");
+                foreach (var i in instructions) {
+                    sb.Append(i.ToString()).Append(' ');
+                }
+                Debug.Log(sb.ToString());
+            }
 
             var hypertap = MatchEnvironment.config.Delays["hypertap"];
 

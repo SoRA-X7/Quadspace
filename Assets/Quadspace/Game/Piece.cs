@@ -19,7 +19,7 @@ namespace Quadspace.Game {
         }
 
         public readonly IEnumerable<Vector2Int> GetPositions() {
-            foreach (var v in MatchEnvironment.pieceRegistry[kind].GetBlocks(r)) {
+            foreach (var v in MatchEnvironment.pieceRegistry[kind].Occupations[r]) {
                 yield return v + new Vector2Int(x, y);
             }
         }
@@ -36,6 +36,16 @@ namespace Quadspace.Game {
 
         public readonly Piece Strafe(int x, int y) {
             return new Piece(kind, this.x + x, this.y + y, r, SpinStatus.None);
+        }
+
+        public readonly IEnumerable<Piece> GetCanonicals() {
+            yield return this;
+            for (var i = 0; i < 4; i++) {
+                var offset = MatchEnvironment.pieceRegistry[kind].Canonicals[r][i];
+                if (offset.HasValue) {
+                    yield return new Piece(kind, x + offset.Value.x, y + offset.Value.y, i, spin);
+                }
+            }
         }
 
         public override string ToString() {

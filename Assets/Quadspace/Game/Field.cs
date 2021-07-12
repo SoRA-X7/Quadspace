@@ -108,5 +108,18 @@ namespace Quadspace.Game {
             if (pos.x < 0 || pos.y < 0 || pos.x >= fieldSize.x || pos.y >= fieldSize.y) return true;
             return Rows[pos.y][pos.x];
         }
+
+        public Field Clone() {
+            var cl = new Field(environment, fieldSize) {
+                BackToBack = BackToBack,
+                Hold = Hold,
+                Ren = Ren
+            };
+            for (var i = 0; i < Rows.Count; i++) {
+                cl.Rows[i] = Rows[i].Clone();
+            }
+
+            return cl;
+        }
     }
 }

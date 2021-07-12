@@ -22,7 +22,7 @@ namespace Quadspace.Game {
 
         private bool pieceAvailable;
         private string[] templateBag;
-        private List<string> bag;
+        public List<string> Bag { get; private set; }
         private Random rand = new Random();
 
         public event Action ResetField;
@@ -43,7 +43,7 @@ namespace Quadspace.Game {
             currentPiece.Hide();
             holdPiece.Hide();
             templateBag = new[] {"I", "O", "T", "J", "L", "S", "Z"}; //TODO
-            bag = new List<string>(templateBag);
+            Bag = new List<string>(templateBag);
             foreach (var t in nextPieces) {
                 var p = GetRandomPieceFromBag();
                 field.Next.Enqueue(p);
@@ -132,11 +132,11 @@ namespace Quadspace.Game {
         }
 
         private int GetRandomPieceFromBag() {
-            var index = rand.Next(bag.Count);
-            var piece = MatchEnvironment.pieceNameLookup[bag[index]].assignedID;
-            bag.RemoveAt(index);
-            if (bag.Count == 0) {
-                bag.AddRange(templateBag);
+            var index = rand.Next(Bag.Count);
+            var piece = MatchEnvironment.pieceNameLookup[Bag[index]].assignedID;
+            Bag.RemoveAt(index);
+            if (Bag.Count == 0) {
+                Bag.AddRange(templateBag);
             }
 
             return piece;
