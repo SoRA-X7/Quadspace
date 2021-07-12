@@ -31,9 +31,7 @@ namespace Quadspace.Game {
         public event Action<Piece> PieceSpawned;
 
         public async UniTask Initialize() {
-            CancelTokenSource?.Cancel();
-
-            ResetField?.Invoke();
+            Stop();
 
             await UniTask.DelayFrame(10);
 
@@ -58,6 +56,12 @@ namespace Quadspace.Game {
                 await UniTask.Yield(PlayerLoopTiming.FixedUpdate);
                 SpawnPiece();
             });
+        }
+
+        public void Stop() {
+            CancelTokenSource?.Cancel();
+
+            ResetField?.Invoke();
         }
 
         public async UniTask LockPiece() {

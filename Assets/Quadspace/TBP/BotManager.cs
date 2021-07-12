@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Quadspace.Game;
 using Quadspace.Game.Moves;
@@ -113,7 +114,11 @@ namespace Quadspace.TBP {
                 if (line == null) return;
 
                 var msg = JsonSerializer.Deserialize<TbpBotMessage>(line);
-                if (msg.type != BotMessageType.info) return;
+                if (msg.type != BotMessageType.info) {
+                    Debug.LogError("Killed bot because received message was unexpected. " +
+                                   $"Expected: {nameof(BotMessageType.info)}, Actual: {msg.type}");
+                    return;
+                }
 
                 BotInfo = JsonSerializer.Deserialize<TbpInfoMessage>(line);
                 await Send(new TbpRulesMessage());
@@ -124,8 +129,11 @@ namespace Quadspace.TBP {
                 if (line == null) return;
 
                 var msg = JsonSerializer.Deserialize<TbpBotMessage>(line);
-                if (msg.type != BotMessageType.ready)
+                if (msg.type != BotMessageType.ready) {
+                    Debug.LogError("Killed bot because received message was unexpected. " +
+                                   $"Expected: {nameof(BotMessageType.ready)}, Actual: {msg.type}");
                     return;
+                }
 
                 Status = BotStatus.Ready;
             }
@@ -171,30 +179,36 @@ namespace Quadspace.TBP {
                             return;
                         }
                     } else {
-                        throw new ArgumentOutOfRangeException();
+                        Debug.LogError("Killed bot because received message was unexpected. " +
+                                       $"Expected: {nameof(BotMessageType.suggestion)}, Actual: {msg.type}");
+                        return;
                     }
                 }
             } finally {
-                if (!process.HasExited) {
-                    await Send(new TbpFrontendMessage(FrontendMessageType.quit));
+                await Quit();
+            }
+        }
+
+        private async UniTask Quit() {
+            if (!process.HasExited) {
+                await Send(new TbpFrontendMessage(FrontendMessageType.quit));
+            }
+
+            var err = stderr.ReadToEnd();
+            if (!string.IsNullOrWhiteSpace(err)) {
+                var botName = BotInfo.name;
+                if (string.IsNullOrWhiteSpace(botName)) {
+                    botName = System.IO.Path.GetFileName(pathToExecutable);
                 }
 
-                var err = stderr.ReadToEnd();
-                if (!string.IsNullOrWhiteSpace(err)) {
-                    var botName = BotInfo.name;
-                    if (string.IsNullOrWhiteSpace(botName)) {
-                        botName = System.IO.Path.GetFileName(pathToExecutable);
-                    }
-
-                    var path = System.IO.Path.Combine(logPathDir,
-                        $"Error_{botName}_{DateTime.Now:yyyyMMdd_HHmmss}.txt");
-                    Debug.LogError(err);
-                    File.WriteAllText(path, err);
-                    Debug.Log($"Error log is created at {path}");
-                    Status = BotStatus.Error;
-                } else {
-                    Status = BotStatus.Quit;
-                }
+                var path = System.IO.Path.Combine(logPathDir,
+                    $"Error_{botName}_{DateTime.Now:yyyyMMdd_HHmmss}.txt");
+                Debug.LogError(err);
+                File.WriteAllText(path, err);
+                Debug.Log($"Error log is created at {path}");
+                Status = BotStatus.Error;
+            } else {
+                Status = BotStatus.Quit;
             }
         }
 
@@ -224,8 +238,9 @@ namespace Quadspace.TBP {
             fb.NewPiece -= OnNewPiece;
             fb.PieceSpawned -= OnPieceSpawned;
 
-            if (process?.HasExited ?? true) return;
-            stdin.WriteLine(JsonSerializer.ToJsonString(new TbpFrontendMessage(FrontendMessageType.quit)));
+            if (Status >= BotStatus.Error) return;
+            
+            Quit().AsTask().Wait();
         }
     }
 }

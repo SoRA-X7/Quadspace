@@ -22,7 +22,7 @@ namespace Quadspace.TBP {
             BotStatus.Ready => "Ready",
             BotStatus.Running => "Running",
             BotStatus.Error => "Error",
-            BotStatus.Quit => "Quit (no error)",
+            BotStatus.Quit => "Quit (w/o error)",
             _ => status.ToString()
         };
     }
