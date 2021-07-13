@@ -15,7 +15,7 @@ namespace Quadspace.Game {
 
         public static GameConfig Load() {
             Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "Configs/"));
-            
+
             var delays = CreateDefault(DelaysFileName, new Dictionary<string, int> {
                 {"fixedFramerate", 60},
                 {"placement", 3},
@@ -28,11 +28,11 @@ namespace Quadspace.Game {
                 {"hypertap", 1},
                 {"softdrop", 2},
             });
-            
+
             var graphics = CreateDefault(GraphicsFileName, new Dictionary<string, int> {
                 {"useVSync", 1}
             });
-            
+
             var logging = CreateDefault(LoggingFileName, new Dictionary<string, int> {
                 {"logBotMessage", 0},
                 {"logFrontendMessage", 0},

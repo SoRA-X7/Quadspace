@@ -10,6 +10,7 @@ namespace Quadspace.Quadspace.UI {
         [SerializeField] private Button pauseButton;
         [SerializeField] private Button pauseButton2;
         [SerializeField] private Button stopButton;
+        [SerializeField] private Image pauseBeforeStartImage;
 
         [SerializeField] private Match match;
 
@@ -24,15 +25,13 @@ namespace Quadspace.Quadspace.UI {
         private void Update() {
             startButton.gameObject.SetActive(!match.Ongoing);
             restartButton.gameObject.SetActive(match.Ongoing);
-            pauseButton.interactable = match.Ongoing;
-            pauseButton2.interactable = match.Ongoing;
-            pauseButton.gameObject.SetActive(!Mathf.Approximately(Time.timeScale, 0));
-            pauseButton2.gameObject.SetActive(Mathf.Approximately(Time.timeScale, 0));
+            pauseButton.gameObject.SetActive(!Mathf.Approximately(Time.timeScale, 0) || !match.Ongoing);
+            pauseButton2.gameObject.SetActive(Mathf.Approximately(Time.timeScale, 0) && match.Ongoing);
+            pauseBeforeStartImage.gameObject.SetActive(Mathf.Approximately(Time.timeScale, 0) && !match.Ongoing);
             stopButton.interactable = match.Ongoing;
         }
 
         private void ProcedureStart() {
-            Time.timeScale = 1f;
             match.BeginMatch();
         }
 

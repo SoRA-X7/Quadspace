@@ -13,7 +13,9 @@ namespace Quadspace.TBP {
         }
 
         private void Update() {
-            text.text = Stringify(botController.manager.Status);
+            if (botController.manager != null) {
+                text.text = Stringify(botController.manager.Status);
+            }
         }
 
         private static string Stringify(BotStatus status) => status switch {

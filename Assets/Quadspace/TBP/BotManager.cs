@@ -64,6 +64,7 @@ namespace Quadspace.TBP {
                 RedirectStandardError = true
             };
             process = Process.Start(start);
+
             Status = BotStatus.Initializing;
             stdout = process.StandardOutput;
             stdin = process.StandardInput;
@@ -106,8 +107,7 @@ namespace Quadspace.TBP {
                 queue = field.Next.Select(i => MatchEnvironment.pieceRegistry[i].name).ToList(),
                 randomizer = new SevenBagRandomizerStart(new List<string>(fb.Bag))
             };
-
-            await UniTask.SwitchToThreadPool();
+            
             {
                 var line = await stdout.ReadLineAsync();
                 LogBotMessage(line);
@@ -137,9 +137,12 @@ namespace Quadspace.TBP {
 
                 Status = BotStatus.Ready;
             }
-
+            
+            await UniTask.Yield(PlayerLoopTiming.FixedUpdate);
             await Send(tbpStartMessage);
             Status = BotStatus.Running;
+
+            await UniTask.SwitchToThreadPool();
 
             try {
                 while (true) {
@@ -158,22 +161,24 @@ namespace Quadspace.TBP {
                         var success = false;
                         PickedMoveIndex = 0;
                         foreach (var candidate in suggestion.moves.Select(c => (Piece) c)) {
-                            if (candidate.GetCanonicals().Any(can => moves.locked.ContainsKey(can))) {
+                            foreach (var can in candidate.GetCanonicals()) {
+                                if (!moves!.locked.ContainsKey(can)) continue;
+                                
                                 await UniTask.WhenAll(
-                                    Send(new TbpPlayMessage(candidate)).AsAsyncUnitUniTask(),
-                                    UniTask.Run(() => pickedPath = moves.RebuildPath(candidate,
+                                    Send(new TbpPlayMessage(can)).AsAsyncUnitUniTask(),
+                                    UniTask.Run(() => pickedPath = moves.RebuildPath(can,
                                         candidate.kind != fb.currentPiece.content.kind)));
                                 moves = null;
                                 success = true;
                                 UniTask.Run(() => controller.MoveAsync(pickedPath!.Value.instructions,
                                         candidate.kind != fb.currentPiece.content.kind, fb.CancelTokenSource.Token))
                                     .Forget();
-                                break;
+                                goto then;
                             }
 
                             PickedMoveIndex++;
                         }
-
+                        then:
                         if (!success) {
                             forfeit = true;
                             return;
@@ -239,7 +244,7 @@ namespace Quadspace.TBP {
             fb.PieceSpawned -= OnPieceSpawned;
 
             if (Status >= BotStatus.Error) return;
-            
+
             Quit().AsTask().Wait();
         }
     }

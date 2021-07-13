@@ -40,10 +40,13 @@ namespace Quadspace.Game {
 
         public readonly IEnumerable<Piece> GetCanonicals() {
             yield return this;
+            if (spin != SpinStatus.None) {
+                yield break;
+            }
             for (var i = 0; i < 4; i++) {
                 var offset = MatchEnvironment.pieceRegistry[kind].Canonicals[r][i];
                 if (offset.HasValue) {
-                    yield return new Piece(kind, x + offset.Value.x, y + offset.Value.y, i, spin);
+                    yield return new Piece(kind, x + offset.Value.x, y + offset.Value.y, i, SpinStatus.None);
                 }
             }
         }
