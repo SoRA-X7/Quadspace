@@ -17,6 +17,7 @@ using Path = Quadspace.Game.Moves.Path;
 
 namespace Quadspace.TBP {
     public class BotManager : IDisposable {
+        private int botIndex;
         private string pathToExecutable;
         private Process process;
         public BotStatus Status { get; private set; } = BotStatus.NotInitialized;
@@ -41,7 +42,8 @@ namespace Quadspace.TBP {
 
         private string logPathDir;
 
-        public BotManager(string pathToExecutable, GameInputProcessor controller) {
+        public BotManager(string pathToExecutable, GameInputProcessor controller, int botIndex) {
+            this.botIndex = botIndex;
             this.pathToExecutable = pathToExecutable;
             this.controller = controller;
             semaphore = new SemaphoreSlim(1, 1);
@@ -99,6 +101,8 @@ namespace Quadspace.TBP {
         }
 
         private async UniTask Run() {
+            UniTask.Run(RedirectLog).Forget();
+
             var tbpStartMessage = new TbpStartMessage {
                 board = field.Rows.Take(40).Select(r => r.blocks.Select(b => b ? b.blockID : null).ToArray()).ToList(),
                 back_to_back = field.BackToBack,
@@ -107,7 +111,7 @@ namespace Quadspace.TBP {
                 queue = field.Next.Select(i => MatchEnvironment.pieceRegistry[i].name).ToList(),
                 randomizer = new SevenBagRandomizerStart(new List<string>(fb.Bag))
             };
-            
+
             {
                 var line = await stdout.ReadLineAsync();
                 LogBotMessage(line);
@@ -137,7 +141,7 @@ namespace Quadspace.TBP {
 
                 Status = BotStatus.Ready;
             }
-            
+
             await UniTask.Yield(PlayerLoopTiming.FixedUpdate);
             await Send(tbpStartMessage);
             Status = BotStatus.Running;
@@ -163,7 +167,7 @@ namespace Quadspace.TBP {
                         foreach (var candidate in suggestion.moves.Select(c => (Piece) c)) {
                             foreach (var can in candidate.GetCanonicals()) {
                                 if (!moves!.locked.ContainsKey(can)) continue;
-                                
+
                                 await UniTask.WhenAll(
                                     Send(new TbpPlayMessage(can)).AsAsyncUnitUniTask(),
                                     UniTask.Run(() => pickedPath = moves.RebuildPath(can,
@@ -178,6 +182,7 @@ namespace Quadspace.TBP {
 
                             PickedMoveIndex++;
                         }
+
                         then:
                         if (!success) {
                             forfeit = true;
@@ -199,21 +204,25 @@ namespace Quadspace.TBP {
                 await Send(new TbpFrontendMessage(FrontendMessageType.quit));
             }
 
-            var err = stderr.ReadToEnd();
-            if (!string.IsNullOrWhiteSpace(err)) {
-                var botName = BotInfo.name;
-                if (string.IsNullOrWhiteSpace(botName)) {
-                    botName = System.IO.Path.GetFileName(pathToExecutable);
-                }
+            Status = BotStatus.Quit;
+        }
 
-                var path = System.IO.Path.Combine(logPathDir,
-                    $"Error_{botName}_{DateTime.Now:yyyyMMdd_HHmmss}.txt");
-                Debug.LogError(err);
-                File.WriteAllText(path, err);
-                Debug.Log($"Error log is created at {path}");
-                Status = BotStatus.Error;
-            } else {
-                Status = BotStatus.Quit;
+        private void RedirectLog() {
+            var path = System.IO.Path.Combine(logPathDir, $"bot{botIndex.ToString()}.log");
+            if (File.Exists(path)) {
+                var prevPath = System.IO.Path.Combine(logPathDir, $"bot{botIndex.ToString()}_prev.log");
+                if (File.Exists(prevPath)) {
+                    File.Delete(prevPath);
+                }
+                File.Move(path, prevPath);
+            }
+
+            using var file = File.CreateText(path);
+            while (true) {
+                var line = stderr.ReadLine();
+                if (line == null) return;
+                file.WriteLine(line);
+                file.Flush();
             }
         }
 

@@ -40,7 +40,9 @@ namespace Quadspace.Game {
             content = newPiece;
             var positions = newPiece.GetPositions().ToList(); //TODO reduce allocation
             for (var i = 0; i < positions.Count; i++) {
-                blocks[i].transform.localPosition = (Vector2) positions[i];
+                if (blocks[i]) {
+                    blocks[i].transform.localPosition = (Vector2) positions[i];
+                }
             }
         }
     }

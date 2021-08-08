@@ -12,6 +12,7 @@ namespace Quadspace.TBP {
 
         private string botExePath;
         [SerializeField] private TMP_Text botExePathText;
+        [SerializeField] private int botIndex;
 
         private void Start() {
             fb = GetComponent<FieldBehaviour>();
@@ -20,7 +21,7 @@ namespace Quadspace.TBP {
             var savedExePath = PlayerPrefs.GetString(PrefKeyBotExe, "");
             if (savedExePath != "") {
                 botExePath = savedExePath;
-                manager = new BotManager(botExePath, controller);
+                manager = new BotManager(botExePath, controller, botIndex);
                 botExePathText.text = System.IO.Path.GetFileName(botExePath);
             }
 
@@ -30,7 +31,7 @@ namespace Quadspace.TBP {
 
             fb.Initialized += () => {
                 if (!string.IsNullOrEmpty(botExePath)) {
-                    manager = new BotManager(botExePath, controller);
+                    manager = new BotManager(botExePath, controller, botIndex);
                     manager.Launch(fb);
                 }
             };
